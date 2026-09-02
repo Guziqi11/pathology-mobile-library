@@ -1,0 +1,21 @@
+.stats { grid-template-columns: repeat(3, 1fr); }
+.tnm-notice { display: grid; gap: 6px; margin-top: 14px; padding: 14px 16px; border-left: 4px solid #2e675c; border-radius: 10px; color: #274740; background: #e7efe9; line-height: 1.6; }
+.tnm-notice span { color: #64746f; font-size: 13px; }
+.tnm-list { display: grid; gap: 10px; }
+.tnm-row { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 16px 17px; border: 1px solid #dbe4de; border-left: 4px solid #2e675c; border-radius: 14px; text-align: left; text-decoration: none; color: #18312d; background: #fff; cursor: pointer; }
+.tnm-row:hover { border-color: #91ada2; transform: translateY(-1px); }
+.tnm-row span { display: grid; gap: 5px; }.tnm-row small { color: #64746f; }.tnm-row em { flex: 0 0 auto; padding: 5px 8px; border-radius: 999px; color: #24594f; background: #e7efe9; font-size: 11px; font-style: normal; font-weight: 800; }
+.tnm-jump { margin: 18px 0; padding: 16px; border-left: 4px solid #2e675c; border-radius: 12px; background: #eff7f3; }.tnm-jump h2 { margin: 0 0 8px; }.tnm-jump p { margin: 0 0 8px; }.tnm-jump a { display: block; margin-top: 7px; color: #2e675c; font-weight: 800; }
+.tnm-jump.select-site { border-left-color: #b8663d; background: #fff4ea; }.tnm-jump.not-applicable, .tnm-jump.other-system { border-left-color: #94a3b8; background: #f1f5f4; }
+.tnm-detail > p { margin-top: 0; }.tnm-meta { display: flex; flex-wrap: wrap; gap: 7px; margin: 14px 0; }.tnm-meta span { padding: 6px 8px; border-radius: 7px; color: #425852; background: #edf3f0; font-size: 11px; }
+.tnm-boundary { padding: 11px 12px; border-left: 4px solid #b8663d; border-radius: 8px; background: #fff4ea; }
+.tnm-category { margin-top: 12px; overflow: hidden; border: 1px solid #dbe4de; border-radius: 14px; background: #fff; }.tnm-category summary { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px; color: #18312d; background: #f7faf8; font-weight: 900; cursor: pointer; }.tnm-category summary small { color: #64746f; font-size: 10px; font-weight: 700; }.tnm-criterion-row { display: grid; grid-template-columns: 7px minmax(70px,auto) minmax(0,1fr); gap: 9px; align-items: start; padding: 14px 12px; border-top: 1px solid #dbe4de; }.tnm-criterion-dot { width: 6px; height: 6px; margin-top: 8px; border-radius: 999px; background: #18312d; }.tnm-criterion-row strong { color: #18312d; font-size: 14px; line-height: 1.55; white-space: nowrap; }.tnm-criterion-row p { margin: 0; color: #263d37; line-height: 1.65; }.tnm-criterion-row p::before { content: "："; margin-left: -7px; }.tnm-criterion-row p em { display: inline-block; margin-left: 6px; padding: 2px 6px; border-radius: 999px; color: #92400e; background: #fef3c7; font-size: 9px; font-style: normal; font-weight: 800; white-space: nowrap; }.tnm-criterion-row.source-check { background: #fffdf7; }
+.tnm-notes { margin-top: 16px; padding: 15px; border-radius: 12px; background: #f0f7f4; }.tnm-notes h2 { margin-top: 0; }.tnm-notes ul { margin: 0; padding-left: 20px; }.tnm-notes li { margin: 7px 0; line-height: 1.6; }
+.tnm-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }.tnm-links a { padding: 8px 10px; border: 1px solid #2e675c; border-radius: 8px; color: #2e675c; font-weight: 800; }
+.tnm-official-sources { margin-top: 16px; }.tnm-official-sources h2 { margin: 0 0 8px; font-size: 16px; }.tnm-official-sources > div { display: grid; gap: 6px; }.tnm-official-sources a { display: grid; gap: 2px; padding: 9px 10px; border: 1px solid #dbe4de; border-radius: 9px; color: #2e675c; text-decoration: none; background: #fbfdfc; }.tnm-official-sources small { color: #64746f; font-size: 10px; font-weight: 600; line-height: 1.45; }
+.tnm-warning { padding: 10px 12px; border-radius: 9px; color: #7f1d1d !important; background: #fee2e2; font-size: 12px; font-weight: 800; }
+@media (max-width: 720px) {
+  .stats article { padding: 14px 10px; text-align: center; }.stats strong { display: block; margin: 0 0 3px; font-size: 23px; }.stats span { font-size: 11px; }
+  .tabs { display: grid; grid-template-columns: repeat(3, 1fr); }.tabs button { padding: 10px 7px; }
+  .tnm-row { align-items: flex-start; flex-direction: column; }.tnm-row em { align-self: flex-start; }
+}

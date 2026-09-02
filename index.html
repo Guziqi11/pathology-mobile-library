@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#173d36" />
+  <title>病例收集系统</title>
+  <link rel="manifest" href="manifest.webmanifest?v=mtk8autp" />
+  <link rel="stylesheet" href="styles.css?v=mtk8autp" />
+  <link rel="stylesheet" href="tnm.css?v=mtk8autp" />
+  <link rel="stylesheet" href="polish.css?v=mtk8autp" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#/"><strong>病例收集系统</strong></a>
+    <div class="header-actions"><small id="network-status">在线</small><button id="personal-button" class="header-button" type="button">我的资料</button></div>
+  </header>
+  <main>
+    <section id="home-view" class="view">
+      <div class="hero"><h1>病理学习资料库</h1><div class="stats" aria-label="资料数量"><article><strong id="disease-count">0</strong><span>个病种</span></article><article><strong id="case-count">0</strong><span>个病例</span></article><article><strong id="tnm-count">0</strong><span>个 TNM 方案</span></article></div><div class="search-row"><input id="search" type="search" placeholder="搜索病名、编号、IHC或分子" aria-label="搜索公开病理资料" autocomplete="off" /><button id="search-submit" type="button">搜索</button></div></div>
+      <div id="content-tabs" class="tabs" aria-label="资料分类"><button class="active" data-tab="diseases">病种库</button><button data-tab="cases">精选病例</button><button data-tab="tnm">TNM分期</button></div>
+      <div id="tnm-notice" class="tnm-notice hidden"></div>
+      <div class="results-toolbar"><p id="result-summary" class="summary"></p><select id="system-filter" aria-label="按系统筛选"><option value="">全部系统</option></select></div>
+      <div id="disease-list" class="list"></div>
+      <div id="case-list" class="case-grid hidden"></div>
+      <div id="tnm-list" class="tnm-list hidden"></div>
+      <div id="global-results" class="global-results hidden"></div>
+    </section>
+    <section id="detail-view" class="view hidden"><button id="back-button" class="back-button">← 返回资料库</button><div id="detail"></div></section>
+    <section id="error-view" class="view hidden"><div class="empty"><h2>资料暂时无法读取</h2><p id="error-message"></p><button id="refresh-data-button" class="refresh-data-button" type="button">重新读取公开资料</button></div></section>
+  </main>
+  <dialog id="personal-dialog" aria-labelledby="personal-title"><div class="dialog-head"><h2 id="personal-title">我的资料</h2><button id="personal-close" aria-label="关闭">×</button></div><div id="personal-content"></div></dialog>
+  <dialog id="gallery"><button id="gallery-close" aria-label="关闭">×</button><button id="gallery-prev" class="gallery-nav prev" aria-label="上一张">‹</button><figure id="gallery-stage"><img id="gallery-image" alt="镜下图片" /><figcaption id="gallery-caption"></figcaption></figure><button id="gallery-next" class="gallery-nav next" aria-label="下一张">›</button></dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <footer>公开只读快照 · TNM供病理速查，不代替完整手册或临床最终分期</footer>
+  <script type="module" src="app.js?v=mtk8autp"></script>
+</body>
+</html>
