@@ -1,0 +1,19 @@
+{
+  "name": "病例收集系统手机只读资料库",
+  "short_name": "病例资料库",
+  "lang": "zh-CN",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f7f5ef",
+  "theme_color": "#173d36",
+  "description": "病理病种、精选病例与 TNM 公开只读资料",
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
