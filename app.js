@@ -14,7 +14,7 @@ import {
   serializeHomeHash,
   writeExternalReturn,
   writePreferences,
-} from "./mobile-utils.mjs?v=aef773e453a71b63";
+} from "./mobile-utils.mjs?v=1fa146d7db75396b";
 
 (() => {
   "use strict";
@@ -59,7 +59,7 @@ import {
   const statusLabels = { applicable: "可直接查", "select-site": "需选部位", "not-applicable": "不适用", "other-system": "其他体系" };
   const EXPECTED_SCHEMA_VERSION = 6;
   const MINIMUM_SCHEMA_VERSION = 5;
-  const dataVersion = "aef773e453a71b63";
+  const dataVersion = "1fa146d7db75396b";
   const hasDataVersion = dataVersion[0] !== "_";
   const scrollKeyPrefix = `pathology-mobile-scroll:${dataVersion}:`;
   const storage = (() => { try { return window.localStorage; } catch { return null; } })();
@@ -548,13 +548,14 @@ import {
   function safeAtlasOriginalUrl(value) {
     try { const url = new URL(String(value || "").trim()); return url.protocol === "https:" && !url.username && !url.password ? url.href : ""; } catch { return ""; }
   }
-  function microscopyAtlasHtml(images, diseaseName) {
+  function microscopyAtlasHtml(images, diseaseName, section = "microscopy") {
     if (!images.length) return "";
-    return '<section id="knowledge-microscopyImages" class="microscopy-atlas"><div class="microscopy-atlas-heading"><div><p class="eyebrow">MORPHOLOGY ATLAS</p><h2>镜下图谱</h2></div><span class="subtle">' + images.length + ' 张精选图</span></div><div class="microscopy-atlas-grid">' + images.map((image, index) => {
-      if (image.pendingDownload) return '<article class="microscopy-atlas-card"><p class="empty">图片尚未下载到本机</p><p>' + escapeHtml(image.caption || '镜下图谱') + '</p></article>';
+    const title = { microscopy: "镜下图谱", gross: "大体图片", ihc: "免疫组化图片" }[section];
+    return '<section id="knowledge-' + section + 'Images" class="microscopy-atlas"><div class="microscopy-atlas-heading"><div><p class="eyebrow">IMAGE ATLAS</p><h2>' + title + '</h2></div><span class="subtle">' + images.length + ' 张图</span></div><div class="microscopy-atlas-grid">' + images.map((image, index) => {
+      if (image.pendingDownload) return '<article class="microscopy-atlas-card"><p class="empty">图片尚未下载到本机</p><p>' + escapeHtml(image.caption || title) + '</p></article>';
       const originalUrl = safeAtlasOriginalUrl(image.originalUrl), meta = [image.magnification, image.stain].filter(Boolean).join(" · ");
       const source = [image.source ? "来源：" + image.source : "", image.attribution ? "署名：" + image.attribution : ""].filter(Boolean).join(" · ");
-      return '<article class="microscopy-atlas-card"><button type="button" class="microscopy-atlas-thumb" data-gallery="' + index + '" aria-label="查看' + escapeHtml(image.caption || diseaseName + "镜下图谱") + '"><img src="' + escapeHtml(assetUrl(image.src)) + '" alt="' + escapeHtml(image.caption || diseaseName + "镜下图谱") + '" loading="lazy" decoding="async" /></button><div class="microscopy-atlas-caption"><strong>' + escapeHtml(image.caption || "镜下图谱") + '</strong>' + (meta ? '<span>' + escapeHtml(meta) + '</span>' : "") + (image.keyFeatures ? '<p>' + escapeHtml(image.keyFeatures) + '</p>' : "") + (source ? '<small>' + escapeHtml(source) + '</small>' : "") + (originalUrl ? '<a href="' + escapeHtml(originalUrl) + '" target="_blank" rel="noopener noreferrer external">查看原始链接 ↗</a>' : "") + '</div></article>';
+      return '<article class="microscopy-atlas-card"><button type="button" class="microscopy-atlas-thumb" data-gallery="' + (image.galleryIndex ?? index) + '" aria-label="查看' + escapeHtml(image.caption || diseaseName + title) + '"><img src="' + escapeHtml(assetUrl(image.src)) + '" alt="' + escapeHtml(image.caption || diseaseName + title) + '" loading="lazy" decoding="async" /></button><div class="microscopy-atlas-caption"><strong>' + escapeHtml(image.caption || title) + '</strong>' + (meta ? '<span>' + escapeHtml(meta) + '</span>' : "") + (image.keyFeatures ? '<p>' + escapeHtml(image.keyFeatures) + '</p>' : "") + (source ? '<small>' + escapeHtml(source) + '</small>' : "") + (originalUrl ? '<a href="' + escapeHtml(originalUrl) + '" target="_blank" rel="noopener noreferrer external">查看原始链接 ↗</a>' : "") + '</div></article>';
     }).join("") + '</div></section>';
   }
   async function renderDisease(id, token, expectedHash) {
@@ -563,9 +564,9 @@ import {
     try {
       const item = { ...base, ...(await loadDetail("disease", id)) }; if (!isCurrentRoute(token, expectedHash)) return;
       recordRecent("disease", id);
-      const microscopyImages = Array.isArray(item.card?.microscopyImages) ? [...item.card.microscopyImages].sort((a, b) => Number(a.order || 0) - Number(b.order || 0)) : [], atlas = microscopyAtlasHtml(microscopyImages, item.name);
+      const microscopyImages = Array.isArray(item.card?.microscopyImages) ? [...item.card.microscopyImages].sort((a, b) => Number(a.order || 0) - Number(b.order || 0)) : [];
       gallery = microscopyImages;
-      const availableFields = Object.keys(cardLabels).filter((field) => String(item.card?.[field] || "").trim() || String(item.card?.rich?.[field] || "").trim());
+      const availableFields = Object.keys(cardLabels).filter((field) => String(item.card?.[field] || "").trim() || String(item.card?.rich?.[field] || "").trim() || ["microscopy", "gross", "ihc"].includes(field) && microscopyImages.some((image) => (image.section || "microscopy") === field));
       const knowledgeOrder = ["microscopy", "ihc", "molecular", "clinical", "gross", "definition"];
       const knowledgeFields = knowledgeOrder.filter((field) => availableFields.includes(field));
       const jumpLabels = knowledgeFields.map((field) => `<button type="button" data-scroll-target="knowledge-${field}">${cardLabels[field]}</button>`).join("");
@@ -573,9 +574,12 @@ import {
       const knowledge = knowledgeFields.length ? `<div class="knowledge-grid">${sectionList(item.card, knowledgeFields, cardLabels, "knowledge", ["microscopy", "ihc"])}</div>` : (!diagnosis ? `<div class="empty knowledge-empty">本病种资料尚待补充。</div>` : "");
       const related = data.cases.filter((value) => value.diseaseId === id);
       $("#detail").innerHTML = `<article class="detail-card"><div class="detail-meta">${escapeHtml(item.id)} · ${escapeHtml(item.system)} · ${escapeHtml(item.tier)}级</div><h1>${escapeHtml(item.name)}</h1><div class="tag-row"><span>${escapeHtml(item.mastery)} · ${escapeHtml(item.frequency)}</span></div>${detailToolbar("disease", id)}${diagnosis}${jumpLabels ? `<nav class="detail-jump" aria-label="病种详情快速跳转">${jumpLabels}</nav>` : ""}${knowledge}${diseaseTnmBlock(item)}${medicalReviewBlock(item)}${related.length ? `<div class="related"><h2>相关精选病例</h2><div class="case-grid">${related.map((value) => `<a class="case-card" href="${detailHash("case", value.publicId)}"><div class="case-card-body"><small class="meta">精选病例</small><h3>${escapeHtml(value.diseaseName)}</h3><p>${escapeHtml(value.microscopy || value.clinical || "查看病例要点")}</p></div></a>`).join("")}</div></div>` : ""}</article>`;
-       if (microscopyImages.length) {
-         $("#detail .detail-jump")?.insertAdjacentHTML("beforeend", '<button type="button" data-scroll-target="knowledge-microscopyImages">镜下图谱</button>');
-         const microscopySection = $("#detail #knowledge-microscopy"); if (microscopySection) microscopySection.insertAdjacentHTML("afterend", atlas); else { const related = $("#detail .related"); if (related) related.insertAdjacentHTML("beforebegin", atlas); else $("#detail .detail-card")?.insertAdjacentHTML("beforeend", atlas); }
+       for (const section of ["microscopy", "gross", "ihc"]) {
+         const images = microscopyImages.map((image, galleryIndex) => ({ ...image, galleryIndex })).filter((image) => (image.section || "microscopy") === section);
+         const atlas = microscopyAtlasHtml(images, item.name, section);
+         if (!atlas) continue;
+         $("#detail .detail-jump")?.insertAdjacentHTML("beforeend", '<button type="button" data-scroll-target="knowledge-' + section + 'Images">' + ({ microscopy: "镜下图谱", gross: "大体图片", ihc: "免疫组化图片" }[section]) + '</button>');
+         const target = $("#detail #knowledge-" + section); if (target) target.insertAdjacentHTML("afterend", atlas); else { const related = $("#detail .related"); if (related) related.insertAdjacentHTML("beforebegin", atlas); else $("#detail .detail-card")?.insertAdjacentHTML("beforeend", atlas); }
        }
        restoreExternalReturn();
     } catch (error) { if (isCurrentRoute(token, expectedHash)) $("#detail").innerHTML = detailFailure(error); }
