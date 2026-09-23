@@ -14,7 +14,7 @@ import {
   serializeHomeHash,
   writeExternalReturn,
   writePreferences,
-} from "./mobile-utils.mjs?v=mu2ulvaw";
+} from "./mobile-utils.mjs?v=aef773e453a71b63";
 
 (() => {
   "use strict";
@@ -59,7 +59,7 @@ import {
   const statusLabels = { applicable: "可直接查", "select-site": "需选部位", "not-applicable": "不适用", "other-system": "其他体系" };
   const EXPECTED_SCHEMA_VERSION = 6;
   const MINIMUM_SCHEMA_VERSION = 5;
-  const dataVersion = "mu2ulvaw";
+  const dataVersion = "aef773e453a71b63";
   const hasDataVersion = dataVersion[0] !== "_";
   const scrollKeyPrefix = `pathology-mobile-scroll:${dataVersion}:`;
   const storage = (() => { try { return window.localStorage; } catch { return null; } })();
