@@ -14,7 +14,7 @@ import {
   serializeHomeHash,
   writeExternalReturn,
   writePreferences,
-} from "./mobile-utils.mjs?v=1fa146d7db75396b";
+} from "./mobile-utils.mjs?v=1282fa98aeb37dbc";
 
 (() => {
   "use strict";
@@ -59,7 +59,7 @@ import {
   const statusLabels = { applicable: "可直接查", "select-site": "需选部位", "not-applicable": "不适用", "other-system": "其他体系" };
   const EXPECTED_SCHEMA_VERSION = 6;
   const MINIMUM_SCHEMA_VERSION = 5;
-  const dataVersion = "1fa146d7db75396b";
+  const dataVersion = "1282fa98aeb37dbc";
   const hasDataVersion = dataVersion[0] !== "_";
   const scrollKeyPrefix = `pathology-mobile-scroll:${dataVersion}:`;
   const storage = (() => { try { return window.localStorage; } catch { return null; } })();
@@ -419,8 +419,8 @@ import {
     else renderBasicLists();
   }
 
-  function sectionList(source, fields, names, prefix = "knowledge", defaults = []) {
-    return fields.filter((field) => String(source?.[field] || "").trim() || String(source?.rich?.[field] || "").trim()).map((field) => `<details class="knowledge-section" id="${prefix}-${field}" ${defaults.includes(field) ? "open" : ""}><summary>${names[field]}</summary><div class="mobile-rich-content">${richFieldHtml(source, field)}</div></details>`).join("");
+  function sectionList(source, fields, names, prefix = "knowledge", defaults = [], imageFields = []) {
+    return fields.filter((field) => String(source?.[field] || "").trim() || String(source?.rich?.[field] || "").trim() || imageFields.includes(field)).map((field) => `<details class="knowledge-section" id="${prefix}-${field}" ${defaults.includes(field) ? "open" : ""}><summary>${names[field]}</summary><div class="mobile-rich-content">${String(source?.[field] || "").trim() || String(source?.rich?.[field] || "").trim() ? richFieldHtml(source, field) : "<p>见下方图片。</p>"}</div></details>`).join("");
   }
 
   function medicalReviewBlock(item) {
@@ -571,7 +571,8 @@ import {
       const knowledgeFields = knowledgeOrder.filter((field) => availableFields.includes(field));
       const jumpLabels = knowledgeFields.map((field) => `<button type="button" data-scroll-target="knowledge-${field}">${cardLabels[field]}</button>`).join("");
       const diagnosis = item.card?.diagnosisFormula || item.card?.rich?.diagnosisFormula ? `<section class="diagnosis-priority" id="knowledge-diagnosisFormula"><h2>诊断公式</h2><div class="mobile-rich-content">${richFieldHtml(item.card, "diagnosisFormula")}</div></section>` : "";
-      const knowledge = knowledgeFields.length ? `<div class="knowledge-grid">${sectionList(item.card, knowledgeFields, cardLabels, "knowledge", ["microscopy", "ihc"])}</div>` : (!diagnosis ? `<div class="empty knowledge-empty">本病种资料尚待补充。</div>` : "");
+      const imageFields = ["microscopy", "gross", "ihc"].filter((field) => microscopyImages.some((image) => (image.section || "microscopy") === field));
+      const knowledge = knowledgeFields.length ? `<div class="knowledge-grid">${sectionList(item.card, knowledgeFields, cardLabels, "knowledge", ["microscopy", "ihc"], imageFields)}</div>` : (!diagnosis ? `<div class="empty knowledge-empty">本病种资料尚待补充。</div>` : "");
       const related = data.cases.filter((value) => value.diseaseId === id);
       $("#detail").innerHTML = `<article class="detail-card"><div class="detail-meta">${escapeHtml(item.id)} · ${escapeHtml(item.system)} · ${escapeHtml(item.tier)}级</div><h1>${escapeHtml(item.name)}</h1><div class="tag-row"><span>${escapeHtml(item.mastery)} · ${escapeHtml(item.frequency)}</span></div>${detailToolbar("disease", id)}${diagnosis}${jumpLabels ? `<nav class="detail-jump" aria-label="病种详情快速跳转">${jumpLabels}</nav>` : ""}${knowledge}${diseaseTnmBlock(item)}${medicalReviewBlock(item)}${related.length ? `<div class="related"><h2>相关精选病例</h2><div class="case-grid">${related.map((value) => `<a class="case-card" href="${detailHash("case", value.publicId)}"><div class="case-card-body"><small class="meta">精选病例</small><h3>${escapeHtml(value.diseaseName)}</h3><p>${escapeHtml(value.microscopy || value.clinical || "查看病例要点")}</p></div></a>`).join("")}</div></div>` : ""}</article>`;
        for (const section of ["microscopy", "gross", "ihc"]) {
@@ -666,7 +667,7 @@ import {
   function resetGalleryTransform() { galleryScale = 1; galleryTranslate = { x: 0, y: 0 }; pinchStartDistance = 0; applyGalleryTransform(); }
   function setGalleryIndex(index) { galleryIndex = (index + gallery.length) % gallery.length; resetGalleryTransform(); renderGallery(); }
   function galleryDistance() { const points = [...galleryPointers.values()]; return points.length < 2 ? 0 : Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y); }
-  function renderGallery() { const image = gallery[galleryIndex]; if (!image) return; $("#gallery-image").src = assetUrl(image.src); $("#gallery-image").alt = image.caption || "镜下图片"; $("#gallery-image").decoding = "async"; $("#gallery-caption").textContent = [image.category, image.magnification, image.stain, image.caption, image.keyFeatures, image.source, image.attribution].filter(Boolean).join(" · ") || "镜下图片"; applyGalleryTransform(); }
+  function renderGallery() { const image = gallery[galleryIndex]; if (!image) return; const section = { microscopy: "镜下图片", gross: "大体图片", ihc: "免疫组化图片" }[image.section || "microscopy"] || "镜下图片"; $("#gallery-image").src = assetUrl(image.src); $("#gallery-image").alt = image.caption || section; $("#gallery-image").decoding = "async"; $("#gallery-caption").textContent = [section, image.category, image.magnification, image.stain, image.caption, image.keyFeatures, image.source, image.attribution].filter(Boolean).join(" · "); applyGalleryTransform(); }
   function openGallery(index) { galleryIndex = index; resetGalleryTransform(); renderGallery(); $("#gallery").showModal(); }
 
   function setNativeBottomTab(value = "library") {

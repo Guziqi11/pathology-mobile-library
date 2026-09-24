@@ -1,4 +1,4 @@
-const CACHE_VERSION = "1fa146d7db75396b";
+const CACHE_VERSION = "1282fa98aeb37dbc";
 const CACHE_PREFIX = "pathology-mobile-";
 const CACHE_NAME = `${CACHE_PREFIX}${CACHE_VERSION}`;
 const SHELL = ["./", "./index.html", "./styles.css", "./tnm.css", "./polish.css", "./app.js", "./mobile-utils.mjs", "./catalog.json", "./manifest.webmanifest", "./icons/icon.svg"];
